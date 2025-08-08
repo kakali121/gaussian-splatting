@@ -103,6 +103,21 @@ Our default, provided install method is based on Conda package and environment m
 SET DISTUTILS_USE_SDK=1 # Windows only
 conda env create --file environment.yml
 conda activate gaussian_splatting
+
+# Karen's Log
+conda env remove --name gaussian_splatting
+conda create -n gaussian_splatting python=3.8
+conda install cudatoolkit=11.8
+pip install plyfile==0.8.1
+pip install torch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 --index-url https://download.pytorch.org/whl/cu118
+pip install tqdm
+
+pip install submodules/diff-gaussian-rasterization/
+pip install submodules/simple-knn
+pip install submodules/fused-ssim/
+
+pip install opencv-python
+pip install joblib
 ```
 Please note that this process assumes that you have CUDA SDK **11** installed, not **12**. For modifications, see below.
 
@@ -335,6 +350,11 @@ sudo apt install -y libglew-dev libassimp-dev libboost-all-dev libgtk-3-dev libo
 # Project setup
 cd SIBR_viewers
 cmake -Bbuild . -DCMAKE_BUILD_TYPE=Release # add -G Ninja to build faster
+cmake -Bbuild . \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_CUDA_COMPILER=/usr/local/cuda-11.8/bin/nvcc \
+  -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-11.8 \
+  -DCMAKE_CUDA_ARCHITECTURES=86
 cmake --build build -j24 --target install
 ``` 
 
@@ -391,6 +411,9 @@ https://github.com/graphdeco-inria/gaussian-splatting/assets/40643808/0940547f-1
 After extracting or installing the viewers, you may run the compiled ```SIBR_gaussianViewer_app[_config]``` app in ```<SIBR install dir>/bin```, e.g.: 
 ```shell
 ./<SIBR install dir>/bin/SIBR_gaussianViewer_app -m <path to trained model>
+
+# Karen's notes
+./install/bin/SIBR_gaussianViewer_app -m ../output/drone/
 ```
 
 It should suffice to provide the ```-m``` parameter pointing to a trained model directory. Alternatively, you can specify an override location for training input data using ```-s```. To use a specific resolution other than the auto-chosen one, specify ```--rendering-size <width> <height>```. Combine it with ```--force-aspect-ratio``` if you want the exact resolution and don't mind image distortion. 
